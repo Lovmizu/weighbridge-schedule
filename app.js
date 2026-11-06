@@ -10,12 +10,12 @@ function load(){try{return {...defaults,...JSON.parse(localStorage.getItem("mws-
 const importedStaff=["Fazrianur", "Biaggi V.", "Joko S.", "Andry I.", "Wendra V.", "M. Sidik"];
 const importedSchedule={"2026-11-01":{"Fazrianur":"OFF","Biaggi V.":"DLS","Joko S.":"NLS","Andry I.":"OFF","Wendra V.":"DLS","M. Sidik":"NLS"},"2026-11-02":{"Fazrianur":"DLS","Biaggi V.":"OFF","Joko S.":"NLS","Andry I.":"P","Wendra V.":"S","M. Sidik":"M"},"2026-11-03":{"Fazrianur":"DLS","Biaggi V.":"NLS","Joko S.":"OFF","Andry I.":"P","Wendra V.":"S","M. Sidik":"M"},"2026-11-04":{"Fazrianur":"P","Biaggi V.":"S","Joko S.":"M","Andry I.":"OFF","Wendra V.":"DLS","M. Sidik":"NLS"},"2026-11-05":{"Fazrianur":"P","Biaggi V.":"S","Joko S.":"M","Andry I.":"DLS","Wendra V.":"OFF","M. Sidik":"NLS"},"2026-11-06":{"Fazrianur":"P","Biaggi V.":"S","Joko S.":"M","Andry I.":"DLS","Wendra V.":"NLS","M. Sidik":"OFF"},"2026-11-07":{"Fazrianur":"P","Biaggi V.":"S","Joko S.":"M","Andry I.":"P","Wendra V.":"M","M. Sidik":"S"},"2026-11-08":{"Fazrianur":"OFF","Biaggi V.":"DLS","Joko S.":"NLS","Andry I.":"OFF","Wendra V.":"NLS","M. Sidik":"DLS"},"2026-11-09":{"Fazrianur":"DLS","Biaggi V.":"OFF","Joko S.":"NLS","Andry I.":"P","Wendra V.":"M","M. Sidik":"S"},"2026-11-10":{"Fazrianur":"DLS","Biaggi V.":"NLS","Joko S.":"OFF","Andry I.":"P","Wendra V.":"M","M. Sidik":"S"},"2026-11-11":{"Fazrianur":"S","Biaggi V.":"M","Joko S.":"P","Andry I.":"OFF","Wendra V.":"NLS","M. Sidik":"DLS"},"2026-11-12":{"Fazrianur":"S","Biaggi V.":"M","Joko S.":"P","Andry I.":"DLS","Wendra V.":"OFF","M. Sidik":"NLS"},"2026-11-13":{"Fazrianur":"S","Biaggi V.":"M","Joko S.":"P","Andry I.":"DLS","Wendra V.":"NLS","M. Sidik":"OFF"},"2026-11-14":{"Fazrianur":"S","Biaggi V.":"M","Joko S.":"P","Andry I.":"P","Wendra V.":"S","M. Sidik":"M"},"2026-11-15":{"Fazrianur":"OFF","Biaggi V.":"NLS","Joko S.":"DLS","Andry I.":"OFF","Wendra V.":"DLS","M. Sidik":"NLS"},"2026-11-16":{"Fazrianur":"NLS","Biaggi V.":"OFF","Joko S.":"DLS","Andry I.":"P","Wendra V.":"S","M. Sidik":"M"},"2026-11-17":{"Fazrianur":"NLS","Biaggi V.":"DLS","Joko S.":"OFF","Andry I.":"P","Wendra V.":"S","M. Sidik":"M"},"2026-11-18":{"Fazrianur":"M","Biaggi V.":"P","Joko S.":"S","Andry I.":"OFF","Wendra V.":"DLS","M. Sidik":"NLS"},"2026-11-19":{"Fazrianur":"M","Biaggi V.":"P","Joko S.":"S","Andry I.":"DLS","Wendra V.":"OFF","M. Sidik":"NLS"},"2026-11-20":{"Fazrianur":"M","Biaggi V.":"P","Joko S.":"S","Andry I.":"DLS","Wendra V.":"NLS","M. Sidik":"OFF"},"2026-11-21":{"Fazrianur":"M","Biaggi V.":"P","Joko S.":"S","Andry I.":"P","Wendra V.":"M","M. Sidik":"S"}};
 const importedDates=Object.keys(importedSchedule);
-// Migrasi jadwal JADWAL13: jangkar baru 1 November 2026.
-if(data.scheduleImportVersion !== "JADWAL13-2026-11-01-v1"){
+// Migrasi jadwal JADWAL13 v2: paksa muat ulang data Excel agar jadwal lama di localStorage tidak menimpa jadwal baru.
+if(data.scheduleImportVersion !== "JADWAL13-2026-11-01-v2"){
   for(let day=1;day<=28;day++) delete data.schedule[`2026-11-${String(day).padStart(2,"0")}`];
   data.staff=importedStaff.slice();
   Object.assign(data.schedule, importedSchedule);
-  data.scheduleImportVersion="JADWAL13-2026-11-01-v1";
+  data.scheduleImportVersion="JADWAL13-2026-11-01-v2";
   localStorage.setItem("mws-data",JSON.stringify(data));
 }
 
@@ -30,7 +30,7 @@ localStorage.setItem("mws-data", JSON.stringify(data));
 function save(){localStorage.setItem("mws-data",JSON.stringify(data));render()}
 function safe(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function shiftLabel(x){return ({S:"SIANG",SR:"SORE",P:"PAGI",M:"MALAM",OFF:"OFF",OT:"OT",NLS:"LONGSHIFT MALAM",DLS:"LONGSHIFT SIANG"})[x]||x}
-// Siklus roster 21 hari: jangkar 8 November 2026. Tanggal setelah periode sumber
+// Siklus roster 21 hari: jangkar 1 November 2026. Tanggal setelah periode sumber
 // dihitung ulang ke hari ke-1..21; edit manual pada tanggal tertentu tetap diutamakan.
 const CYCLE_START="2026-11-01";
 function getEntry(date,name){
